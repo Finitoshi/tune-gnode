@@ -44,17 +44,17 @@ wait_for_ipfs() {
 }
 
 run_graph_node() {
-    echo "Starting Graph Node on http-port 8000..."
+    echo "🚀 Starting Graph Node on HTTP port 8000 (host: 0.0.0.0)..."
 
     if [ -n "$GRAPH_NODE_CONFIG" ]; then
         wait_for_ipfs "$ipfs"
         sleep 5
         exec graph-node \
             --node-id "$node_id" \
-            --http-port 8000 \
-            --ws-port 8001 \
-            --json-rpc-port 8020 \
-            --index-node-port 8030 \
+            --http-port 8000 --http-host 0.0.0.0 \
+            --ws-port 8001 --ws-host 0.0.0.0 \
+            --json-rpc-port 8020 --json-rpc-host 0.0.0.0 \
+            --index-node-port 8030 --index-node-host 0.0.0.0 \
             --config "$GRAPH_NODE_CONFIG" \
             --ipfs "$ipfs" \
             ${fork_base:+ --fork-base "$fork_base"}
@@ -70,10 +70,10 @@ run_graph_node() {
 
         exec graph-node \
             --node-id "$node_id" \
-            --http-port 8000 \
-            --ws-port 8001 \
-            --json-rpc-port 8020 \
-            --index-node-port 8030 \
+            --http-port 8000 --http-host 0.0.0.0 \
+            --ws-port 8001 --ws-host 0.0.0.0 \
+            --json-rpc-port 8020 --json-rpc-host 0.0.0.0 \
+            --index-node-port 8030 --index-node-host 0.0.0.0 \
             --postgres-url "$postgres_url" \
             --ethereum-rpc $ethereum \
             --ipfs "$ipfs" \
