@@ -44,14 +44,16 @@ wait_for_ipfs() {
 }
 
 run_graph_node() {
-    echo "🚀 Starting Graph Node on HTTP port 8000 (host: 0.0.0.0)..."
+    # Render sets PORT; default to 8000 if missing
+    HTTP_PORT=${PORT:-8000}
+    echo "🚀 Starting Graph Node on port $HTTP_PORT (host: 0.0.0.0)..."
 
     if [ -n "$GRAPH_NODE_CONFIG" ]; then
         wait_for_ipfs "$ipfs"
         sleep 5
         exec graph-node \
             --node-id "$node_id" \
-            --http-port 8000 --http-host 0.0.0.0 \
+            --http-port "$HTTP_PORT" --http-host 0.0.0.0 \
             --ws-port 8001 --ws-host 0.0.0.0 \
             --json-rpc-port 8020 --json-rpc-host 0.0.0.0 \
             --index-node-port 8030 --index-node-host 0.0.0.0 \
@@ -70,7 +72,7 @@ run_graph_node() {
 
         exec graph-node \
             --node-id "$node_id" \
-            --http-port 8000 --http-host 0.0.0.0 \
+            --http-port "$HTTP_PORT" --http-host 0.0.0.0 \
             --ws-port 8001 --ws-host 0.0.0.0 \
             --json-rpc-port 8020 --json-rpc-host 0.0.0.0 \
             --index-node-port 8030 --index-node-host 0.0.0.0 \
@@ -95,14 +97,17 @@ start_combined_node() {
     run_graph_node
 }
 
+# Disable block ingestion if not the main ingesting node
 if [[ ${node_id} != "${BLOCK_INGESTOR}" ]]; then
     export DISABLE_BLOCK_INGESTOR=true
 fi
 
+# Sanitize node_id if literal is not forced
 if [ -z "$GRAPH_NODE_ID_USE_LITERAL_VALUE" ]; then
     node_id="${node_id//-/_}"
 fi
 
+# Optional: disable core dumps
 if [ -n "$disable_core_dumps" ]; then
     ulimit -c 0
 fi
